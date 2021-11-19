@@ -1,8 +1,8 @@
-from grad_engine import Variable
+from gradflow.grad_engine import Variable
 import numpy as np
 import logging
 
-logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.DEBUG)
+log = logging.getLogger()
 
 
 def test_add():
@@ -10,10 +10,7 @@ def test_add():
     variable_two = Variable(np.array([30, 40]))
     result = variable_one + variable_two
     expected_result = np.array([40, 60])
-    if not np.all(result.data == expected_result):
-        logging.warning(f"Exptected: {expected_result} and got: {result.data}")
-    else:
-        logging.info("Passed")
+    assert np.all(result.data == expected_result)
 
 
 def test_multiply():
