@@ -13,6 +13,7 @@ class Variable:
 		self.data = data
 		self.grad = 0
 		self.parents = parents
+		self._back_grad_fn = lambda x: None
 
 
 	def __add__(self, other: Variable) -> Variable:
@@ -22,9 +23,9 @@ class Variable:
 			self.grad += result.grad
 			other.grad += result.grad
 
-		result._back_grad_fn = _back_grad_fn
-		return Variable(result)
-
+		variable = Variable(result, parents=(self, other))
+		variable._back_grad_fn = _back_grad_fn
+		return variable
 
 	def __mul__(self, other: Variable):
 		self.grad = other.data
@@ -35,12 +36,17 @@ class Variable:
 			self.grad += other.data * result.grad
 			other.grad += self.data * result.grad
 		
-		result._back_grad_fn = _back_grad_fn
-		return Variable(result)
+		variable = Variable(result, parents=(self, other))
+		variable._back_grad_fn = _back_grad_fn
+		return variable
 
 
 	def backward(self) -> None:
-		pass
+		variables = [self]
+		while len(variables):
+			variable = variables.pop(0)
+			variable._back_grad_fn()
+			variables.extend(list(self.parents))
 
 
 if __name__ == "__main__":
