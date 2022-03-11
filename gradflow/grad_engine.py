@@ -13,40 +13,42 @@ class Variable:
 		self.data = data
 		self.grad = 0
 		self.parents = parents
-		self._back_grad_fn = lambda x: None
+		self._back_grad_fn = lambda: None
 
 
 	def __add__(self, other: Variable) -> Variable:
-		result =  Variable(self.data + other.data)
+		result = self.data + other.data
+		variable = Variable(result, parents=(self, other))
 
 		def _back_grad_fn():
-			self.grad += result.grad
-			other.grad += result.grad
+			self.grad += variable.grad
+			other.grad += variable.grad
 
-		variable = Variable(result, parents=(self, other))
 		variable._back_grad_fn = _back_grad_fn
 		return variable
 
-	def __mul__(self, other: Variable):
+
+	def __mul__(self, other: Variable) -> Variable:
 		self.grad = other.data
 		other.grad = self.data
-		result = Variable(np.matmul(self.data, other.data))
+		result = np.matmul(self.data, other.data)
+		variable = Variable(result, parents=(self, other))
 
 		def _back_grad_fn():
-			self.grad += other.data * result.grad
-			other.grad += self.data * result.grad
+			self.grad += other.data * variable.grad
+			other.grad += self.data * variable.grad
 		
-		variable = Variable(result, parents=(self, other))
 		variable._back_grad_fn = _back_grad_fn
 		return variable
 
 
 	def backward(self) -> None:
-		variables = [self]
-		while len(variables):
-			variable = variables.pop(0)
+		self.grad = 1
+		variable_queue = [self]
+		while len(variable_queue):
+			variable = variable_queue.pop(0)
 			variable._back_grad_fn()
-			variables.extend(list(self.parents))
+			variable_queue.extend(list(variable.parents))
 
 
 if __name__ == "__main__":
