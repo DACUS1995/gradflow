@@ -19,21 +19,18 @@ def test_add_result():
 
 
 def test_add_grad():
-    variable_one = Variable(np.array([10, 20]))
-    variable_two = Variable(np.array([30, 40]))
+    variable_one = Variable(np.array([10, 20], dtype=np.float32))
+    variable_two = Variable(np.array([30, 40], dtype=np.float32))
     result = variable_one + variable_two
-    result.backward()
+    result.backward(np.ones_like(result.data))
 
     torch_variable_one = torch.tensor([10, 20], dtype=torch.float32, requires_grad=True)
     torch_variable_two = torch.tensor([30, 40], dtype=torch.float32, requires_grad=True)
     torch_result = torch_variable_one + torch_variable_two
     torch_result.backward([torch.tensor([1, 1])])
 
-    print(torch_variable_one.grad)
-    print(torch_variable_two.grad)
-
-    print(variable_one.grad)
-    print(variable_two.grad)
+    assert np.array_equal(torch_variable_one.grad.numpy(), variable_one.grad)
+    assert np.array_equal(torch_variable_two.grad.numpy(), variable_two.grad)
 
 
 def test_multiply_result():

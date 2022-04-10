@@ -1,6 +1,7 @@
 from __future__ import annotations
-import numpy as np
 from typing import List, Tuple, Dict, Union
+
+import numpy as np
 
 
 class Variable:
@@ -42,9 +43,19 @@ class Variable:
 		return variable
 
 
-	def backward(self) -> None:
-		self.grad = 1
+	def backward(self, grad: Variable | np.ndarray = None) -> None:
+		if grad is None:
+			grad = np.array([1])
+		
+		if not isinstance(grad, (Variable, np.ndarray)):
+			raise ValueError("The backward gradient must be a numpy array")
+		
+		if isinstance(grad, Variable):
+			grad = grad.grad
+		
+		self.grad = grad
 		variable_queue = [self]
+
 		while len(variable_queue):
 			variable = variable_queue.pop(0)
 			variable._back_grad_fn()
