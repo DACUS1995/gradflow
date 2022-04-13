@@ -1,18 +1,22 @@
 .PHONY: init test
 
 init:
-	pip install -r requirements.txt
+	pip -m install -r requirements.txt
 
 format:
 	autoflake --remove-all-unused-imports -i **/*.py
 	isort **/*.py
 	black **/*.py
 
+lint: ## [Local development] Run mypy, pylint and black
+	python -m mypy gradflow
+	python -m pylint gradflow
+
 typecheck:
-	mypy src/ pytorch-lightning/ tests/
+	python -m mypy gradflow tests
 
 test:
-	python -m tests.grad_engine_test
+	python -m unittest -v
 
 clean:
 	rm -rfv **/__pycache__ && echo
