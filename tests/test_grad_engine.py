@@ -33,8 +33,8 @@ class TestGradEngine(unittest.TestCase):
     
     
     def test_add_grad(self):
-        variable_one = Variable(np.array([10, 20], dtype=np.float32))
-        variable_two = Variable(np.array([30, 40], dtype=np.float32))
+        variable_one = Variable(np.array([10, 20], dtype=np.float32), requires_grad=True)
+        variable_two = Variable(np.array([30, 40], dtype=np.float32), requires_grad=True)
         result = variable_one + variable_two
         result.backward(np.ones_like(result.data))
     
@@ -58,8 +58,8 @@ class TestGradEngine(unittest.TestCase):
 
 
     def test_matrix_multiply_grad(self):
-        variable_one = Variable(np.array([10, 20], dtype=np.float32))
-        variable_two = Variable(np.array([30, 40], dtype=np.float32))
+        variable_one = Variable(np.array([10, 20], dtype=np.float32), requires_grad=True)
+        variable_two = Variable(np.array([30, 40], dtype=np.float32), requires_grad=True)
         result = variable_one @ variable_two.T()
         result.backward(np.ones_like(result.data))
     

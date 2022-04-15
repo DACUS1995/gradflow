@@ -5,7 +5,12 @@ import numpy as np
 
 
 class Variable:
-    def __init__(self, data: Variable | np.ndarray, parents: Tuple = ()) -> None:
+    def __init__(
+        self, 
+        data: Variable | np.ndarray, 
+        parents: Tuple[Variable] = None, 
+        requires_grad: bool = False
+    ) -> None:
         if isinstance(data, self.__class__):
             data = data.data
         elif not isinstance(data, np.ndarray):
@@ -13,7 +18,8 @@ class Variable:
 
         self.data = data
         self.grad = 0
-        self.parents = parents
+        self.parents = parents or ()
+        self.requires_grad = requires_grad
         self._back_grad_fn = lambda: None
 
 
@@ -24,11 +30,14 @@ class Variable:
         result = self.data + other.data
         variable = Variable(result, parents=(self, other))
 
-        def _back_grad_fn():
-            self.grad += variable.grad
-            other.grad += variable.grad
+        if any((parent.requires_grad for parent in variable.parents)):
+            variable.requires_grad = True
 
-        variable._back_grad_fn = _back_grad_fn
+            def _back_grad_fn():
+                self.grad += variable.grad
+                other.grad += variable.grad
+
+            variable._back_grad_fn = _back_grad_fn
         return variable
 
 
@@ -43,11 +52,14 @@ class Variable:
 
         variable = Variable(result, parents=(self, other))
 
-        def _back_grad_fn():
-            self.grad += other.data * variable.grad
-            other.grad += self.data * variable.grad
-        
-        variable._back_grad_fn = _back_grad_fn
+        if any((parent.requires_grad for parent in variable.parents)):
+            variable.requires_grad = True
+
+            def _back_grad_fn():
+                self.grad += other.data * variable.grad
+                other.grad += self.data * variable.grad
+
+            variable._back_grad_fn = _back_grad_fn
         return variable
 
 

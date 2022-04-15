@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import List, Any
 
 from gradflow.grad_engine import Variable
@@ -21,7 +22,7 @@ class Module:
         return self.forward(input)
 
     @property
-    def modules(self):
+    def modules(self) -> List[Module]:
         return self._modules
 
     @property

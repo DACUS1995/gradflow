@@ -16,7 +16,7 @@ typecheck:
 	python -m mypy gradflow tests
 
 test:
-	python -m unittest -v
+	python -m unittest
 
 clean:
 	rm -rfv **/__pycache__ && echo
