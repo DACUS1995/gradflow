@@ -11,6 +11,9 @@ class Linear(Module):
         self.weights = Variable(weights_data, requires_grad=True)
         self.b = Variable(np.random.uniform(size=out_size), requires_grad=True)
 
+        self.add_parameter(self.weights)
+        self.add_parameter(self.b)
+
     def forward(self, input: Variable):
         tmp = input @ self.weights
         out = tmp + self.b
