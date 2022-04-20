@@ -1,3 +1,4 @@
+from difflib import restore
 import numpy as np
 
 from gradflow.grad_engine import Variable
@@ -16,4 +17,9 @@ def relu(input: Variable) -> Variable:
 
 
 def softmax(input: Variable) -> Variable:
-    pass
+    e_x = np.exp(input.data - np.max(input.data))
+    result = e_x / e_x.sum(axis=0)
+    return result
+
+    # SM = self.value.reshape((-1,1))
+    # jac = np.diagflat(self.value) - np.dot(SM, SM.T)

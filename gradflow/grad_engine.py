@@ -91,6 +91,7 @@ class Variable:
         self.grad = grad
         variable_queue = [self]
 
+        # TODO check if topological sort is needed
         while len(variable_queue):
             variable = variable_queue.pop(0)
             variable._back_grad_fn()
