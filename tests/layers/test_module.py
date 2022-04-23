@@ -10,7 +10,12 @@ class TestModule(unittest.TestCase):
     def test_module(self):
         parameter_one = Variable(np.array([10, 20]), requires_grad=True)
         parameter_two = Variable(np.array([30, 40]), requires_grad=True)
-        module_one = Module()
+
+        class ModuleInner(Module):            
+            def forward(self, input: Variable) -> Variable:
+                pass
+
+        module_one = ModuleInner()
 
         class ModuleTest(Module):
             def __init__(self) -> None:
@@ -18,6 +23,9 @@ class TestModule(unittest.TestCase):
                 self.parameter_one = self.add_parameter(parameter_one)
                 self.parameter_two = self.add_parameter(parameter_two)
                 self.module_one = self.add_module(module_one)
+            
+            def forward(self, input: Variable) -> Variable:
+                pass
 
         module_test = ModuleTest()
 

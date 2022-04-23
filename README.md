@@ -1,4 +1,4 @@
-# A small, educational autograd system with deep neural networks support
+# A small, educational, numpy based deep learning framework with minimal PyTorch-like functionality.
 ![gradflow](assets/logo.png "gradflow")
 
 ---

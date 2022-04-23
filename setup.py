@@ -5,7 +5,7 @@ from setuptools import setup
 from setuptools import find_packages
 
 with open("README.md", "r") as file:
-    description = file.read()
+    long_description = file.read()
 
 with open("requirements.txt", encoding="utf8") as file:
     requirements = file.readlines()
@@ -28,12 +28,16 @@ setup(
     author="Tudor Surdoiu",
     author_email="studormarian@gmail.com",
     license="MIT",
-    description=" ",
-    long_description=description,
+    description="A small, educational, numpy based deep learning framework with minimal PyTorch-like functionality",
+    long_description=long_description,
     long_description_content_type="text/markdown",
     keywords=["gradient-engine"],
     url="https://github.com/DACUS1995/gradflow",
     packages=find_packages(),
-    classifiers=[],
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
     install_requires=requirements,
 )

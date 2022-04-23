@@ -1,4 +1,5 @@
 from __future__ import annotations
+from abc import ABC, abstractmethod
 from typing import List, Any, Set
 import os
 
@@ -7,7 +8,7 @@ from gradflow.grad_engine import Variable
 DEFAULT_MODULE_NAME = "Module"
 
 
-class Module:
+class Module(ABC):
     def __init__(self, training = True) -> None:
         self._parameters: List[Variable] = []
         self._modules: List[Module] = []
@@ -15,6 +16,7 @@ class Module:
         self._module_name = DEFAULT_MODULE_NAME
 
 
+    @abstractmethod
     def forward(self, input: Variable) -> Variable:
         raise NotImplemented()
 
@@ -27,10 +29,6 @@ class Module:
     def add_module(self, module: Module) -> Module:
         self._modules.append(module)
         return module
-
-
-    def zero_grad(self):
-        raise NotImplementedError()
 
 
     def __call__(self, input: Variable) -> Variable:

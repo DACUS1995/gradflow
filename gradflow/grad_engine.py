@@ -17,7 +17,7 @@ class Variable:
             raise TypeError(f"The data type provided is not supported: {type(data)}")
 
         self.data = data
-        self.grad = 0
+        self.grad: Union[np.ndarray, None] = 0 if requires_grad else None
         self.parents = parents or ()
         self.requires_grad = requires_grad
         self._back_grad_fn = lambda: None
@@ -69,7 +69,7 @@ class Variable:
 
 
     def T(self) -> Variable:
-        variable = Variable(np.transpose(self.data), parents=(self,))
+        variable = Variable(np.transpose(self.data), parents=(self,), requires_grad=self.requires_grad)
         
         def _back_grad_fn():
             self.grad += variable.grad
