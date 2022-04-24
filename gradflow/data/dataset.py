@@ -27,7 +27,7 @@ class Dataset:
     
     def __getitem__(self, idx):
         if idx >= len(self):
-            raise IndexError()
+            raise IndexError
 
         sample_batch = self._features[self._cur_index: self._cur_index + self._batch_size]
         label_batch = self._labels[self._cur_index : self._cur_index + self._batch_size]

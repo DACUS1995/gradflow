@@ -28,7 +28,7 @@ class TestCommonActivations(unittest.TestCase):
         # output.backward(np.array([1, 1]))
 
         torch_input = torch.tensor([10, 20, 30], dtype=torch.float32, requires_grad=True)
-        torch_output = torch.nn.functional.softmax(torch_input)
+        torch_output = torch.nn.functional.softmax(torch_input, dim=0)
         # torch_output.backward(torch.tensor([1, 1]))
 
         self.assertTrue(np.all(output.data == torch_output.detach().numpy()))

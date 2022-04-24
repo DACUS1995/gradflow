@@ -15,10 +15,13 @@ class TestCommonActivations(unittest.TestCase):
 
         dataset = Dataset(features, labels, batch_size)
 
+        self.assertTrue(dataset[0][0].shape[0] == batch_size)
         self.assertTrue(np.all(dataset[0][0] == features[0:batch_size]))
         self.assertTrue(np.all(dataset[0][1] == labels[0:batch_size]))
-        self.assertTrue(dataset[0].shape[0] == batch_size)
-
+        
+        with self.assertRaises(IndexError):
+            dataset[10]
+        
 
 if __name__ == "__main__":
     unittest.main()

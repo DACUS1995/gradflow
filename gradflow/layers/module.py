@@ -18,7 +18,7 @@ class Module(ABC):
 
     @abstractmethod
     def forward(self, input: Variable) -> Variable:
-        raise NotImplemented()
+        raise NotImplemented
 
 
     def add_parameter(self, parameter: Variable) -> Variable:
