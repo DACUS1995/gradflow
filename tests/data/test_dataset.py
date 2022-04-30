@@ -15,9 +15,9 @@ class TestCommonActivations(unittest.TestCase):
 
         dataset = Dataset(features, labels, batch_size)
 
-        self.assertTrue(dataset[0][0].shape[0] == batch_size)
-        self.assertTrue(np.all(dataset[0][0] == features[0:batch_size]))
-        self.assertTrue(np.all(dataset[0][1] == labels[0:batch_size]))
+        self.assertTrue(dataset[0][0].data.shape[0] == batch_size)
+        self.assertTrue(np.all(dataset[0][0].data == features[0:batch_size]))
+        self.assertTrue(np.all(dataset[0][1].data == labels[0:batch_size]))
         
         with self.assertRaises(IndexError):
             dataset[10]

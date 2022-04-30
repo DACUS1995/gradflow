@@ -2,6 +2,8 @@ from typing import Tuple
 
 import numpy as np
 
+from gradflow.grad_engine import Variable
+
 class Dataset:
     def __init__(self, features: np.ndarray, labels: np.ndarray, batch_size=16) -> None:
         self._features = features
@@ -15,8 +17,8 @@ class Dataset:
         return self
 
 
-    def __next__(self) -> Tuple[np.ndarray, np.ndarray]:
-        if self._cur_index >= len(self.samples):
+    def __next__(self) -> Tuple[Variable, Variable]:
+        if self._cur_index >= len(self):
             raise StopIteration
         
         sample_batch, label_batch = self[self._cur_index]
@@ -25,12 +27,12 @@ class Dataset:
         return sample_batch, label_batch
 
     
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> Tuple[Variable, Variable]:
         if idx >= len(self):
             raise IndexError
 
-        sample_batch = self._features[self._cur_index: self._cur_index + self._batch_size]
-        label_batch = self._labels[self._cur_index : self._cur_index + self._batch_size]
+        sample_batch = Variable(self._features[self._cur_index: self._cur_index + self._batch_size])
+        label_batch = Variable(self._labels[self._cur_index : self._cur_index + self._batch_size])
 
         return sample_batch, label_batch
 

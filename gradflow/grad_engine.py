@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import List, Tuple, Dict, Union
 
 import numpy as np
+from pkg_resources import require
 
 
 class Variable:
@@ -17,9 +18,9 @@ class Variable:
             raise TypeError(f"The data type provided is not supported: {type(data)}")
 
         self.data = data
-        self.grad: Union[np.ndarray, None] = 0 if requires_grad else None
+        self.grad: Union[int, None] = .0 if requires_grad else None
         self.parents = parents or ()
-        self.requires_grad = requires_grad
+        self._requires_grad = requires_grad
         self._back_grad_fn = lambda: None
 
 
@@ -41,6 +42,26 @@ class Variable:
         return variable
 
 
+    def __sub__(self, other: Variable) -> Variable:
+        if not isinstance(other, Variable):
+            raise TypeError("The second operator must be a Variable type")
+
+        result = self.data - other.data
+        variable = Variable(result, parents=(self, other))
+
+        if any((parent.requires_grad for parent in variable.parents)):
+            variable.requires_grad = True
+
+            def _back_grad_fn():
+                self._accumulate_gradient(self, variable.grad)
+                self._accumulate_gradient(other, -variable.grad)
+                # self.grad += variable.grad
+                # other.grad -= variable.grad
+
+            variable._back_grad_fn = _back_grad_fn
+        return variable
+
+
     def __matmul__(self, other: Variable) -> Variable:
         if not isinstance(other, Variable):
             raise TypeError("The second operator must be a Variable type")
@@ -56,8 +77,10 @@ class Variable:
             variable.requires_grad = True
 
             def _back_grad_fn():
-                self.grad += other.data * variable.grad
-                other.grad += self.data * variable.grad
+                self._accumulate_gradient(self, other.data * variable.grad)
+                self._accumulate_gradient(other, self.data * variable.grad)
+                # self.grad += other.data * variable.grad
+                # other.grad += self.data * variable.grad
 
             variable._back_grad_fn = _back_grad_fn
         return variable
@@ -99,7 +122,23 @@ class Variable:
 
 
     def __repr__(self):
-         return f"Variable(data={self.data}, grad={self.grad})"
+        return f"Variable(data={self.data}, grad={self.grad}, requires_grad={self.requires_grad})"
+
+
+    @property
+    def requires_grad(self) -> bool:
+        return self._requires_grad
+
+    @requires_grad.setter
+    def requires_grad(self, requires_grad: bool):
+        self.grad = .0 if requires_grad else None
+        self._requires_grad = requires_grad
+    
+
+    @staticmethod
+    def _accumulate_gradient(variable: Variable, grad: np.ndarray):
+        if variable.requires_grad:
+            variable.grad += grad
 
 
 if __name__ == "__main__":

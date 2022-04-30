@@ -12,11 +12,15 @@ class BaseOptimizer(ABC):
         self._parameters = parameters
         self._lr = lr
 
-
     def zero_grad(self):
         for parameter in self._parameters:
-            parameter.grad = np.array([0])
+            if parameter.requires_grad == False:
+                continue
 
+            if isinstance(parameter.grad, np.ndarray):
+                parameter.grad = np.zeros_like(parameter.grad)
+            else:
+                parameter.grad = np.array([0], dtype=np.float)
 
     @abstractmethod
     def step(self):
@@ -29,7 +33,6 @@ class NaiveSGD(BaseOptimizer):
 
     def step(self):
         for parameter in self._parameters:
-            delta = np.zeros_like(parameter.data)
-            delta += -self._lr * parameter.grad
+            delta = -self._lr * parameter.grad
             parameter.data = parameter.data + delta
 

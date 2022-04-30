@@ -47,7 +47,32 @@ class TestGradEngine(unittest.TestCase):
         self.assertTrue(np.array_equal(torch_variable_two.grad.numpy(), variable_two.grad))
 
 
-    def test_matrix_multiply_result(self):
+    def test_substract_result(self):
+        variable_one = Variable(np.array([10, 20]))
+        variable_two = Variable(np.array([30, 40]))
+        
+        result = variable_one - variable_two
+        expected_result = np.array([-20, -20])
+        
+        self.assertTrue(np.all(result.data == expected_result))
+
+
+    def test_substract_grad(self):
+        variable_one = Variable(np.array([10, 20], dtype=np.float32), requires_grad=True)
+        variable_two = Variable(np.array([30, 40], dtype=np.float32), requires_grad=True)
+        result = variable_one - variable_two
+        result.backward(np.ones_like(result.data))
+    
+        torch_variable_one = torch.tensor([10, 20], dtype=torch.float32, requires_grad=True)
+        torch_variable_two = torch.tensor([30, 40], dtype=torch.float32, requires_grad=True)
+        torch_result = torch_variable_one - torch_variable_two
+        torch_result.backward(torch.tensor([1, 1]))
+
+        self.assertTrue(np.array_equal(torch_variable_one.grad.numpy(), variable_one.grad))
+        self.assertTrue(np.array_equal(torch_variable_two.grad.numpy(), variable_two.grad))
+
+
+    def test_vector_multiply_result(self):
         variable_one = Variable(np.array([10, 20]))
         variable_two = Variable(np.array([30, 40]))
         
@@ -57,7 +82,7 @@ class TestGradEngine(unittest.TestCase):
         self.assertTrue(np.all(result.data == expected_result))
 
 
-    def test_matrix_multiply_grad(self):
+    def test_vector_multiply_grad(self):
         variable_one = Variable(np.array([10, 20], dtype=np.float32), requires_grad=True)
         variable_two = Variable(np.array([30, 40], dtype=np.float32), requires_grad=True)
         result = variable_one @ variable_two.T()

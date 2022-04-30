@@ -1,7 +1,10 @@
-.PHONY: init test
+.PHONY: init test install
 
 init:
-	pip -m install -r requirements.txt
+	python -m pip install -r requirements.txt
+
+install:
+	python -m pip install -e ./
 
 format:
 	autoflake --remove-all-unused-imports -i **/*.py
