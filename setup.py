@@ -31,7 +31,7 @@ setup(
     description="A small, educational, numpy based deep learning framework with minimal PyTorch-like functionality",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    keywords=["gradient-engine"],
+    keywords=["gradient-engine", "deep-learning"],
     url="https://github.com/DACUS1995/gradflow",
     packages=find_packages(),
     classifiers=[

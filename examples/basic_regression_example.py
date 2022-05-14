@@ -1,5 +1,7 @@
+from typing import Dict
 import numpy as np
 from sklearn import datasets
+from matplotlib import pyplot as plt
 
 from gradflow.data.dataset import Dataset
 from gradflow.grad_engine import Variable
@@ -35,27 +37,45 @@ def build_model() -> Module:
     return ModuleExample()
 
 
-def train(model:Module, dataset:Dataset):
-    optimizer = NaiveSGD(model.parameters)
+def train(model:Module, dataset:Dataset, config:Dict):
+    optimizer = NaiveSGD(model.parameters, lr=config["lr"])
+    training_loss = []
 
-    for X, y in dataset:
-        pred_y = model(X)
+    for epoch in range(config["epochs"]):
+        epoch_loss = .0
 
-        loss = (pred_y - y) @ (pred_y - y)
-        
-        loss.backward()
-        optimizer.step()
-        optimizer.zero_grad()
+        for X, y in dataset:
+            pred_y = model(X)
 
-        print(f"Loss: {loss.data}")
+            loss = (pred_y - y) @ (pred_y - y)
+            epoch_loss += loss.data.item()
 
+            loss.backward()
+            optimizer.step()
+            optimizer.zero_grad()
+
+        epoch_loss /= len(dataset)
+        training_loss.append(epoch_loss)
+        print(f"Epoch {epoch} | Loss: {epoch_loss}")
+
+    plt.title("Training loss")
+    plt.plot(training_loss)
+    plt.show()
 
 
 def main():
     model = build_model()
     dataset = get_dataset()
+    config = {
+        "epochs": 10,
+        "lr": 0.001
+    }
 
-    train(model, dataset)
+    train(
+        model, 
+        dataset, 
+        config
+    )
 
 
 if __name__ == "__main__":

@@ -28,8 +28,8 @@ class BaseOptimizer(ABC):
 
 
 class NaiveSGD(BaseOptimizer):
-    def __init__(self, parameters: List[Variable]) -> None:
-        super().__init__(parameters=parameters)
+    def __init__(self, parameters: List[Variable], lr=0.001) -> None:
+        super().__init__(parameters=parameters, lr=lr)
 
     def step(self):
         for parameter in self._parameters:
