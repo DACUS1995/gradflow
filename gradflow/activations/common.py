@@ -9,7 +9,7 @@ def relu(input: Variable) -> Variable:
 
     if input.requires_grad:
         def _back_grad_fn():
-            input.grad += (variable.data > 0) * variable.grad
+            input.grad += np.transpose((variable.data > 0)) * variable.grad
         variable._back_grad_fn = _back_grad_fn
         variable.requires_grad = True
 

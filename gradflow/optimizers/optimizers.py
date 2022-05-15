@@ -1,5 +1,6 @@
 from typing import List
 from abc import ABC, abstractmethod
+from unittest import expectedFailure
 
 import numpy as np
 
@@ -33,6 +34,10 @@ class NaiveSGD(BaseOptimizer):
 
     def step(self):
         for parameter in self._parameters:
-            delta = -self._lr * parameter.grad
+            clipped_grad = np.clip(parameter.grad, -1000, 1000)
+            delta = -self._lr * clipped_grad
+            delta = np.transpose(delta)
+            # print(delta.shape)
+            # print(parameter.data.shape)
+            # print()
             parameter.data = parameter.data + delta
-
