@@ -31,8 +31,8 @@ def build_model() -> Module:
     class ModuleExample(Module):
         def __init__(self) -> None:
             super().__init__()
-            self.linear_1 = self.add_module(Linear(1, 10))
-            self.linear_2 = self.add_module(Linear(10, 1))
+            self.linear_1 = self.add_module(Linear(1, 32))
+            self.linear_2 = self.add_module(Linear(32, 1))
         
         def forward(self, input: Variable) -> Variable:
             out = self.linear_1(input=input)
@@ -64,8 +64,9 @@ def train(model:Module, dataset:Dataset, config:Dict):
         training_loss.append(epoch_loss)
         print(f"Epoch {epoch} | Loss: {epoch_loss}")
 
+    feature_space_sample = np.linspace(np.amin(dataset._features), np.amax(dataset._features), 100).reshape(-1, 1)
     plt.scatter(dataset._features, dataset._labels)
-    plt.plot(dataset._features, model(Variable(dataset._features)).data, color="green")
+    plt.plot(feature_space_sample, model(Variable(feature_space_sample)).data, color="green")
     plt.show()
 
     plt.title("Training loss")
@@ -77,7 +78,7 @@ def main():
     model = build_model()
     dataset = get_dataset()
     config = {
-        "epochs": 1000,
+        "epochs": 100,
         "lr": 0.001
     }
 

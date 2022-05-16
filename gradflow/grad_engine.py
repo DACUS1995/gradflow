@@ -55,8 +55,6 @@ class Variable:
             def _back_grad_fn():
                 self._accumulate_gradient(self, variable.grad)
                 self._accumulate_gradient(other, -variable.grad)
-                # self.grad += variable.grad
-                # other.grad -= variable.grad
 
             variable._back_grad_fn = _back_grad_fn
         return variable
@@ -79,8 +77,6 @@ class Variable:
             def _back_grad_fn():
                 self._accumulate_gradient(self, other.data * variable.grad)
                 self._accumulate_gradient(other, self.data * variable.grad)
-                # self.grad += other.data * variable.grad
-                # other.grad += self.data * variable.grad
 
             variable._back_grad_fn = _back_grad_fn
         return variable
