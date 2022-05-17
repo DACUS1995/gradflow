@@ -2,7 +2,6 @@ from __future__ import annotations
 from typing import List, Tuple, Dict, Union
 
 import numpy as np
-from pkg_resources import require
 
 
 class Variable:

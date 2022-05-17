@@ -123,3 +123,4 @@ dmypy.json
 .pyre/
 *.pt
 *pyc
+.vscode
