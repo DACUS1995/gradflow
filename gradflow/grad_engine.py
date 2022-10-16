@@ -1,19 +1,37 @@
 from __future__ import annotations
+from enum import Enum
 from typing import List, Tuple, Dict, Union
 
 import numpy as np
+
+from gradflow.data_containers import NumpyDataContainer, DataContainerBase, GPUDataContainer
+
+
+class Device(str, Enum):
+    CPU = "cpu"
+    GPU = "gpu"
+
+_device_to_container_map = {
+    "cpu": NumpyDataContainer,
+    "gpu": GPUDataContainer
+}
 
 
 class Variable:
     def __init__(
         self, 
-        data: Variable | np.ndarray, 
+        data: Variable | np.ndarray | DataContainerBase, 
         parents: Tuple[Variable] = None, 
-        requires_grad: bool = False
+        requires_grad: bool = False,
+        device: str = Device.CPU.value
     ) -> None:
-        if isinstance(data, self.__class__):
+        if isinstance(data, Variable):
             data = data.data
-        elif not isinstance(data, np.ndarray):
+        elif isinstance(data, np.ndarray):
+            data = _device_to_container_map[device](data)
+        elif isinstance(data, DataContainerBase):
+            pass
+        else:
             raise TypeError(f"The data type provided is not supported: {type(data)}")
 
         self.data = data
@@ -21,6 +39,7 @@ class Variable:
         self.parents = parents or ()
         self._requires_grad = requires_grad
         self._back_grad_fn = lambda: None
+        self.device = device
 
 
     def __add__(self, other: Variable) -> Variable:
@@ -34,8 +53,8 @@ class Variable:
             variable.requires_grad = True
 
             def _back_grad_fn():
-                self.grad += variable.grad
-                other.grad += variable.grad
+                self._accumulate_gradient(self, variable.grad)
+                self._accumulate_gradient(other, variable.grad)
 
             variable._back_grad_fn = _back_grad_fn
         return variable
@@ -63,7 +82,8 @@ class Variable:
         if not isinstance(other, Variable):
             raise TypeError("The second operator must be a Variable type")
 
-        result = np.matmul(self.data, other.data)
+        result = self.data @ other.data
+        # result = np.matmul(self.data, other.data)
 
         if not isinstance(result, np.ndarray):
             result = np.array([result])
@@ -84,6 +104,15 @@ class Variable:
     def __pow__(self, exponent: int) -> Variable:
         if not isinstance(exponent, int):
             raise TypeError("For power operation the exponent must be a scalar integer value")
+
+        result = self.data ** exponent
+        variable = Variable(result, parents=(self), requires_grad=self.requires_grad)
+
+        if variable.requires_grad:
+            def _back_grad_fn():
+                self._accumulate_gradient(self, exponent * (self.data ** (exponent - 1)) * variable.grad)
+
+            variable._back_grad_fn = _back_grad_fn
 
 
     def T(self) -> Variable:
@@ -119,7 +148,6 @@ class Variable:
     def __repr__(self):
         return f"Variable(data={self.data}, grad={self.grad}, requires_grad={self.requires_grad})"
 
-
     @property
     def requires_grad(self) -> bool:
         return self._requires_grad
@@ -134,6 +162,18 @@ class Variable:
     def _accumulate_gradient(variable: Variable, grad: np.ndarray):
         if variable.requires_grad:
             variable.grad += grad
+
+
+    def to(self, device: str) -> DataContainerBase:
+        if self.device == device:
+            return self
+
+        if device == Device.CPU.value:
+            return Variable(self.data.data.get(), device=Device.CPU.value)
+        elif device == Device.GPU.value:
+            return Variable(self.data.data, device=Device.GPU.value)
+        else:
+            raise ValueError("Unsupported device.")
 
 
 if __name__ == "__main__":
