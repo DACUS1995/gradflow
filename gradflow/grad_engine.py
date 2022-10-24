@@ -32,6 +32,7 @@ class Variable:
         elif isinstance(data, DataContainerBase):
             pass
         else:
+            print(isinstance(data, np.float32))
             raise TypeError(f"The data type provided is not supported: {type(data)}")
 
         self.data = data

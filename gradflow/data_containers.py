@@ -5,6 +5,8 @@ from typing import Tuple
 import numpy as np
 import pycuda.gpuarray as gpuarray
 
+import gradflow
+
 
 class DataContainerBase(ABC):
 	@abstractmethod
@@ -40,9 +42,13 @@ class DataContainerBase(ABC):
 	def shape(self) -> tuple[int]:
 		pass
 
+	@abstractmethod
+	def item(self):
+		pass
+
 
 class NumpyDataContainer(DataContainerBase):
-	def __init__(self, data: np.array | NumpyDataContainer) -> None:
+	def __init__(self, data: np.ndarray | NumpyDataContainer) -> None:
 		super().__init__()
 
 		if isinstance(data, NumpyDataContainer):
@@ -50,16 +56,16 @@ class NumpyDataContainer(DataContainerBase):
 		self.data = data
 
 	def __add__(self, other: NumpyDataContainer):
-		return self.data + other.data
+		return NumpyDataContainer(self.data + other.data)
 
 	def __sub__(self, other: NumpyDataContainer):
-		return self.data - other.data
+		return NumpyDataContainer(self.data - other.data)
 
 	def __matmul__(self, other: NumpyDataContainer):
-		return self.data @ other.data
+		return NumpyDataContainer(self.data @ other.data)
 
 	def __pow__(self, exp: NumpyDataContainer):
-		return self.data ** exp
+		return NumpyDataContainer(self.data ** exp)
 
 	def __eq__(self, other: NumpyDataContainer) -> bool:
 		return self.data == other.data
@@ -73,6 +79,18 @@ class NumpyDataContainer(DataContainerBase):
 
 	def __ge__(self, other: float):
 		return self.data >= other
+
+	def item(self) -> float:
+		return self.data.item()
+
+	def __mul__(self, other: float):
+		return self.data * other
+
+	def max(self) -> NumpyDataContainer:
+		return NumpyDataContainer(np.array(np.max(self.data)))
+
+	def exp(self) -> NumpyDataContainer:
+		return NumpyDataContainer(np.exp(self.data))
 
 
 class GPUDataContainer(DataContainerBase):

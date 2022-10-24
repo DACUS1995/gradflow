@@ -21,8 +21,10 @@ def relu(input: Variable) -> Variable:
 
 
 def softmax(input: Variable) -> Variable:
-    e_x = np.exp(input.data - np.max(input.data))
-    result = e_x / e_x.sum(axis=0)
+	# TODO Abstract the usage of numpy
+    # e_x = np.exp(input.data - np.max(input.data))
+    e_x = (input.data - input.data.max()).exp()
+    result = e_x.data / e_x.data.sum(axis=0)
     return result
 
     # SM = self.value.reshape((-1,1))
