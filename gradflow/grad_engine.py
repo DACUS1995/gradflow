@@ -32,7 +32,6 @@ class Variable:
         elif isinstance(data, DataContainerBase):
             pass
         else:
-            print(isinstance(data, np.float32))
             raise TypeError(f"The data type provided is not supported: {type(data)}")
 
         self.data = data
@@ -84,11 +83,6 @@ class Variable:
             raise TypeError("The second operator must be a Variable type")
 
         result = self.data @ other.data
-        # result = np.matmul(self.data, other.data)
-
-        if not isinstance(result, np.ndarray):
-            result = np.array([result])
-
         variable = Variable(result, parents=(self, other))
 
         if any((parent.requires_grad for parent in variable.parents)):
@@ -117,7 +111,7 @@ class Variable:
 
 
     def T(self) -> Variable:
-        variable = Variable(np.transpose(self.data), parents=(self,), requires_grad=self.requires_grad)
+        variable = Variable(self.data.T(), parents=(self,), requires_grad=self.requires_grad)
         
         def _back_grad_fn():
             self.grad += variable.grad

@@ -11,8 +11,8 @@ class TestLinearLayer(unittest.TestCase):
         input = Variable(np.array([10, 20]))
 
         linear_model = Linear(in_size=2, out_size=2)
-        linear_model.weights.data = np.ones_like(linear_model.weights.data)
-        linear_model.b.data = np.ones_like(linear_model.b.data)
+        linear_model.weights.data.data = np.ones_like(linear_model.weights.data.data)
+        linear_model.b.data.data = np.ones_like(linear_model.b.data.data)
 
         output = linear_model(input)
 

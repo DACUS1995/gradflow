@@ -92,6 +92,9 @@ class NumpyDataContainer(DataContainerBase):
 	def exp(self) -> NumpyDataContainer:
 		return NumpyDataContainer(np.exp(self.data))
 
+	def T(self) -> NumpyDataContainer:
+		return NumpyDataContainer(np.transpose(self.data))
+
 
 class GPUDataContainer(DataContainerBase):
 	def __init__(self, data: np.array | GPUDataContainer) -> None:

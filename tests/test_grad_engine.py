@@ -36,7 +36,7 @@ class TestGradEngine(unittest.TestCase):
         variable_one = Variable(np.array([10, 20], dtype=np.float32), requires_grad=True)
         variable_two = Variable(np.array([30, 40], dtype=np.float32), requires_grad=True)
         result = variable_one + variable_two
-        result.backward(np.ones_like(result.data))
+        result.backward(np.ones_like(result.data.data))
     
         torch_variable_one = torch.tensor([10, 20], dtype=torch.float32, requires_grad=True)
         torch_variable_two = torch.tensor([30, 40], dtype=torch.float32, requires_grad=True)
@@ -61,7 +61,7 @@ class TestGradEngine(unittest.TestCase):
         variable_one = Variable(np.array([10, 20], dtype=np.float32), requires_grad=True)
         variable_two = Variable(np.array([30, 40], dtype=np.float32), requires_grad=True)
         result = variable_one - variable_two
-        result.backward(np.ones_like(result.data))
+        result.backward(np.ones_like(result.data.data))
     
         torch_variable_one = torch.tensor([10, 20], dtype=torch.float32, requires_grad=True)
         torch_variable_two = torch.tensor([30, 40], dtype=torch.float32, requires_grad=True)
@@ -79,14 +79,14 @@ class TestGradEngine(unittest.TestCase):
         result = variable_one @ variable_two.T()
         expected_result = np.array([1100])
         
-        self.assertTrue(np.all(result.data == expected_result))
+        self.assertTrue(np.all(result.data.data == expected_result))
 
 
     def test_vector_multiply_grad(self):
         variable_one = Variable(np.array([10, 20], dtype=np.float32), requires_grad=True)
         variable_two = Variable(np.array([30, 40], dtype=np.float32), requires_grad=True)
         result = variable_one @ variable_two.T()
-        result.backward(np.ones_like(result.data))
+        result.backward(np.ones_like(result.data.data))
     
         torch_variable_one = torch.tensor([10, 20], dtype=torch.float32, requires_grad=True)
         torch_variable_two = torch.tensor([30, 40], dtype=torch.float32, requires_grad=True)
