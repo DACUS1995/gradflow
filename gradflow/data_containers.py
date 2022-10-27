@@ -46,6 +46,22 @@ class DataContainerBase(ABC):
 	def item(self):
 		pass
 
+	@abstractmethod
+	def __mul__(self, other: float):
+		pass
+
+	@abstractmethod
+	def max(self) -> DataContainerBase:
+		pass
+
+	@abstractmethod
+	def exp(self) -> DataContainerBase:
+		pass
+
+	@abstractmethod
+	def T(self) -> DataContainerBase:
+		pass
+
 
 class NumpyDataContainer(DataContainerBase):
 	def __init__(self, data: np.ndarray | NumpyDataContainer) -> None:
@@ -130,6 +146,21 @@ class GPUDataContainer(DataContainerBase):
 
 	def __ge__(self, other: float):
 		return self.data >= other
+
+	def item(self) -> float:
+		return self.data.item()
+
+	def __mul__(self, other: float):
+		return self.data * other
+
+	def max(self) -> GPUDataContainer:
+		return GPUDataContainer(np.array(np.max(self.data)))
+
+	def exp(self) -> GPUDataContainer:
+		return GPUDataContainer(np.exp(self.data))
+
+	def T(self) -> GPUDataContainer:
+		return GPUDataContainer(np.transpose(self.data))
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 from __future__ import annotations
 from enum import Enum
-from typing import List, Tuple, Dict, Union
+from typing import Tuple, Union
 
 import numpy as np
 
@@ -45,6 +45,7 @@ class Variable:
     def __add__(self, other: Variable) -> Variable:
         if not isinstance(other, Variable):
             raise TypeError("The second operator must be a Variable type")
+        self._assert_same_device(self, other)
 
         result = self.data + other.data
         variable = Variable(result, parents=(self, other))
@@ -63,6 +64,7 @@ class Variable:
     def __sub__(self, other: Variable) -> Variable:
         if not isinstance(other, Variable):
             raise TypeError("The second operator must be a Variable type")
+        self._assert_same_device(self, other)
 
         result = self.data - other.data
         variable = Variable(result, parents=(self, other))
@@ -81,6 +83,7 @@ class Variable:
     def __matmul__(self, other: Variable) -> Variable:
         if not isinstance(other, Variable):
             raise TypeError("The second operator must be a Variable type")
+        self._assert_same_device(self, other)
 
         result = self.data @ other.data
         variable = Variable(result, parents=(self, other))
@@ -143,9 +146,11 @@ class Variable:
     def __repr__(self):
         return f"Variable(data={self.data}, grad={self.grad}, requires_grad={self.requires_grad})"
 
+
     @property
     def requires_grad(self) -> bool:
         return self._requires_grad
+
 
     @requires_grad.setter
     def requires_grad(self, requires_grad: bool):
@@ -157,6 +162,11 @@ class Variable:
     def _accumulate_gradient(variable: Variable, grad: np.ndarray):
         if variable.requires_grad:
             variable.grad += grad
+
+
+    def _assert_same_device(self, first_operand: Variable, second_operand: Variable) -> None:
+        if first_operand.device != second_operand.device:
+            raise Exception("Both the first and the second device of the operation must have the same value.")
 
 
     def to(self, device: str) -> DataContainerBase:
