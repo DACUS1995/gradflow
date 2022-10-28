@@ -3,8 +3,10 @@ import unittest
 
 import numpy as np
 import torch
+from zmq import device
 
 from gradflow.grad_engine import Variable
+from gradflow.data_containers import NumpyDataContainer, GPUDataContainer
 
 log = logging.getLogger()
 
@@ -95,6 +97,28 @@ class TestGradEngine(unittest.TestCase):
 
         self.assertTrue(np.array_equal(torch_variable_one.grad.numpy(), variable_one.grad))
         self.assertTrue(np.array_equal(torch_variable_two.grad.numpy(), variable_two.grad))
+
+    
+    def test_device_to_data_container(self):
+        variable_cpu = Variable(np.array([1,2]), device="cpu")
+        variable_gpu = Variable(np.array([1,2]), device="gpu")
+
+        self.assertTrue(isinstance(variable_cpu.data, NumpyDataContainer))
+        self.assertTrue(isinstance(variable_gpu.data, GPUDataContainer))
+
+    def test_device_transfer(self):
+        variable_cpu = Variable(np.array([1,2]), device="cpu")
+        variable_gpu = variable_cpu.to("gpu")
+        self.assertTrue(variable_gpu.device == "gpu")
+        self.assertTrue(isinstance(variable_gpu.data, GPUDataContainer))
+
+        variable_gpu = variable_gpu.to("gpu")
+        self.assertTrue(variable_gpu.device == "gpu")
+        self.assertTrue(isinstance(variable_gpu.data, GPUDataContainer))
+
+        variable_cpu = variable_gpu.to("cpu")
+        self.assertTrue(variable_cpu.device == "cpu")
+        self.assertTrue(isinstance(variable_cpu.data, NumpyDataContainer))
 
 
 

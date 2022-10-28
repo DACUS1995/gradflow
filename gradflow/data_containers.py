@@ -4,6 +4,8 @@ from typing import Tuple
 
 import numpy as np
 import pycuda.gpuarray as gpuarray
+import pycuda.autoinit
+# TODO Check if pycuda is install and throw only if it is used
 
 import gradflow
 
@@ -148,7 +150,7 @@ class GPUDataContainer(DataContainerBase):
 		return self.data >= other
 
 	def item(self) -> float:
-		return self.data.item()
+		return self.data.get()
 
 	def __mul__(self, other: float):
 		return self.data * other

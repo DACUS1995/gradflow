@@ -169,12 +169,12 @@ class Variable:
             raise Exception("Both the first and the second device of the operation must have the same value.")
 
 
-    def to(self, device: str) -> DataContainerBase:
+    def to(self, device: str) -> Variable:
         if self.device == device:
             return self
 
         if device == Device.CPU.value:
-            return Variable(self.data.data.get(), device=Device.CPU.value)
+            return Variable(self.data.item(), device=Device.CPU.value)
         elif device == Device.GPU.value:
             return Variable(self.data.data, device=Device.GPU.value)
         else:
