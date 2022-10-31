@@ -7,6 +7,7 @@
 * Gradflow has support for various tools that are needed to train a neural network like: optimizers, datasets handling, activation functions and extensible model modules. 
 * This gradient computation engine uses the [reverse accumulation](https://en.wikipedia.org/wiki/Automatic_differentiation#Reverse_accumulation) method of automatic differentiation which involves calculating the gradient from the outermost operation inwards.
 * You only need numpy to run the basic setup.
+* Stable numpy backend and experimental gpu (pycuda) backend. Similar to pytorch you can now specify a target device for Variables and Modules. It will default to "cpu" if the device is not provided.
 
 ---
 ## Usage
