@@ -1,13 +1,15 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
+from ast import Import
 from typing import Tuple
+import importlib
 
 import numpy as np
-import pycuda.gpuarray as gpuarray
-import pycuda.autoinit
-# TODO Check if pycuda is install and throw only if it is used
 
 import gradflow
+
+_has_pycuda = importlib.util.find_spec("pycuda") is not None
+_pycuda_is_imported = False
 
 
 class DataContainerBase(ABC):
@@ -117,6 +119,16 @@ class NumpyDataContainer(DataContainerBase):
 class GPUDataContainer(DataContainerBase):
 	def __init__(self, data: np.array | GPUDataContainer) -> None:
 		super().__init__()
+		global _pycuda_is_imported
+		global gpuarray
+
+		if not _has_pycuda:
+			raise ImportError("In order to use the GPU data backend you must install PyCuda.")
+		if not _pycuda_is_imported:
+			import pycuda.gpuarray as gpuarray
+			import pycuda.autoinit
+			_pycuda_is_imported = True
+
 
 		if isinstance(data, GPUDataContainer):
 			data = data.data
@@ -125,16 +137,16 @@ class GPUDataContainer(DataContainerBase):
 		self.data = data
 
 	def __add__(self, other: GPUDataContainer):
-		return self.data + other.data
+		return GPUDataContainer(self.data + other.data)
 
 	def __sub__(self, other: GPUDataContainer):
-		return self.data - other.data
+		return GPUDataContainer(self.data - other.data)
 
 	def __matmul__(self, other: GPUDataContainer):
-		return self.data @ other.data
+		return GPUDataContainer(self.data @ other.data)
 
 	def __pow__(self, exp: GPUDataContainer):
-		return self.data ** exp
+		return GPUDataContainer(self.data ** exp)
 
 	def __eq__(self, other: GPUDataContainer) -> bool:
 		return self.data == other.data
@@ -153,7 +165,7 @@ class GPUDataContainer(DataContainerBase):
 		return self.data.get()
 
 	def __mul__(self, other: float):
-		return self.data * other
+		return GPUDataContainer(self.data * other)
 
 	def max(self) -> GPUDataContainer:
 		return GPUDataContainer(np.array(np.max(self.data)))

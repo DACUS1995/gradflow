@@ -3,7 +3,7 @@ import unittest
 
 import numpy as np
 import torch
-from zmq import device
+import parameterized
 
 from gradflow.grad_engine import Variable
 from gradflow.data_containers import NumpyDataContainer, GPUDataContainer
@@ -11,10 +11,11 @@ from gradflow.data_containers import NumpyDataContainer, GPUDataContainer
 log = logging.getLogger()
 
 
+@parameterized.parameterized_class([{"device": "cpu"}, {"device": "gpu"}])
 class TestGradEngine(unittest.TestCase):
     def test_variable_copy_init(self):
-        variable_one = Variable(np.array([10, 20]))
-        variable_two = Variable(variable_one)
+        variable_one = Variable(np.array([10, 20]), device=self.device)
+        variable_two = Variable(variable_one, device=self.device)
 
         self.assertTrue(variable_one.data is variable_two.data)
 
@@ -25,8 +26,8 @@ class TestGradEngine(unittest.TestCase):
 
 
     def test_add_result(self):
-        variable_one = Variable(np.array([10, 20]))
-        variable_two = Variable(np.array([30, 40]))
+        variable_one = Variable(np.array([10, 20]), device=self.device)
+        variable_two = Variable(np.array([30, 40]), device=self.device)
         
         result = variable_one + variable_two
         expected_result = np.array([40, 60])
@@ -35,8 +36,8 @@ class TestGradEngine(unittest.TestCase):
     
     
     def test_add_grad(self):
-        variable_one = Variable(np.array([10, 20], dtype=np.float32), requires_grad=True)
-        variable_two = Variable(np.array([30, 40], dtype=np.float32), requires_grad=True)
+        variable_one = Variable(np.array([10, 20], dtype=np.float32), requires_grad=True, device=self.device)
+        variable_two = Variable(np.array([30, 40], dtype=np.float32), requires_grad=True, device=self.device)
         result = variable_one + variable_two
         result.backward(np.ones_like(result.data.data))
     
@@ -105,6 +106,7 @@ class TestGradEngine(unittest.TestCase):
 
         self.assertTrue(isinstance(variable_cpu.data, NumpyDataContainer))
         self.assertTrue(isinstance(variable_gpu.data, GPUDataContainer))
+
 
     def test_device_transfer(self):
         variable_cpu = Variable(np.array([1,2]), device="cpu")
