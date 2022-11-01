@@ -1,6 +1,5 @@
 from typing import List
 from abc import ABC, abstractmethod
-from unittest import expectedFailure
 
 import numpy as np
 

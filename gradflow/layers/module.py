@@ -4,6 +4,7 @@ from typing import List, Any, Set
 import os
 
 from gradflow.grad_engine import Variable
+from gradflow.grad_engine import Device
 
 DEFAULT_MODULE_NAME = "Module"
 
@@ -14,6 +15,7 @@ class Module(ABC):
         self._modules: List[Module] = []
         self._training = training
         self._module_name = DEFAULT_MODULE_NAME
+        self._device = Device.CPU.value
 
 
     @abstractmethod
@@ -32,6 +34,8 @@ class Module(ABC):
 
 
     def __call__(self, input: Variable) -> Variable:
+        if input.device != self._device:
+            raise Exception(f"Input data device {input.device} is different than the current module device {self._device}")
         return self.forward(input)
 
 
@@ -75,3 +79,9 @@ class Module(ABC):
             children_modules_description = f"Children modules: {os.linesep} {os.linesep.join(modules_description_list)}"
 
         return self.module_name + children_modules_description
+
+
+    def to(self, device: str = "cpu") -> None:
+        for parameter in self.parameters:
+            parameter.to(device)
+        self._device = device

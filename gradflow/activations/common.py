@@ -2,14 +2,18 @@ from difflib import restore
 import numpy as np
 
 from gradflow.grad_engine import Variable
+from gradflow.data_containers import NumpyDataContainer
 
 def relu(input: Variable) -> Variable:
-    result = np.maximum(input.data, 0)
+    if not isinstance(input.data, NumpyDataContainer):
+        raise ValueError("Only supported data container is numy based curently.")
+
+    result = np.maximum(input.data.data, 0)
     variable = Variable(result, parents=(input,))
 
     if input.requires_grad:
         def _back_grad_fn():
-            input.grad += np.transpose((variable.data > 0)) * variable.grad
+            input.grad += np.transpose((variable.data.data > 0)) * variable.grad
         variable._back_grad_fn = _back_grad_fn
         variable.requires_grad = True
 
@@ -17,8 +21,8 @@ def relu(input: Variable) -> Variable:
 
 
 def softmax(input: Variable) -> Variable:
-    e_x = np.exp(input.data - np.max(input.data))
-    result = e_x / e_x.sum(axis=0)
+    e_x = (input.data - input.data.max()).exp()
+    result = e_x.data / e_x.data.sum(axis=0)
     return result
 
     # SM = self.value.reshape((-1,1))
