@@ -55,6 +55,10 @@ class DataContainerBase(ABC):
 		pass
 
 	@abstractmethod
+	def __neg__(self) -> DataContainerBase:
+		pass
+
+	@abstractmethod
 	def max(self) -> DataContainerBase:
 		pass
 
@@ -105,6 +109,9 @@ class NumpyDataContainer(DataContainerBase):
 
 	def __mul__(self, other: float):
 		return self.data * other
+
+	def __neg__(self) -> NumpyDataContainer:
+		return NumpyDataContainer(-self.data)
 
 	def max(self) -> NumpyDataContainer:
 		return NumpyDataContainer(np.array(np.max(self.data)))
@@ -166,6 +173,9 @@ class GPUDataContainer(DataContainerBase):
 
 	def __mul__(self, other: float):
 		return GPUDataContainer(self.data * other)
+
+	def __neg__(self) -> NumpyDataContainer:
+		raise NotImplementedError()
 
 	def max(self) -> GPUDataContainer:
 		return GPUDataContainer(np.array(np.max(self.data)))
