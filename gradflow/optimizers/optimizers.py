@@ -20,7 +20,7 @@ class BaseOptimizer(ABC):
             if isinstance(parameter.grad, np.ndarray):
                 parameter.grad = np.zeros_like(parameter.grad)
             else:
-                parameter.grad = np.array([0], dtype=np.float)
+                parameter.grad = np.array([0], dtype=float)
 
     @abstractmethod
     def step(self):
