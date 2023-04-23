@@ -6,6 +6,7 @@ import numpy as np
 
 from gradflow.data_containers import NumpyDataContainer, DataContainerBase, GPUDataContainer
 
+from gradflow.utils import grad_enabled
 
 class Device(str, Enum):
     CPU = "cpu"
@@ -51,7 +52,7 @@ class Variable:
         variable = Variable(result, parents=(self, other))
 
         if any((parent.requires_grad for parent in variable.parents)):
-            variable.requires_grad = True
+            variable.requires_grad = grad_enabled()
 
             def _back_grad_fn():
                 self._accumulate_gradient(self, variable.grad)
@@ -70,7 +71,7 @@ class Variable:
         variable = Variable(result, parents=(self, other))
 
         if any((parent.requires_grad for parent in variable.parents)):
-            variable.requires_grad = True
+            variable.requires_grad = grad_enabled()
 
             def _back_grad_fn():
                 self._accumulate_gradient(self, variable.grad)
@@ -89,7 +90,7 @@ class Variable:
         variable = Variable(result, parents=(self, other))
 
         if any((parent.requires_grad for parent in variable.parents)):
-            variable.requires_grad = True
+            variable.requires_grad = grad_enabled()
 
             def _back_grad_fn():
                 self._accumulate_gradient(self, other.data * variable.grad)
@@ -104,7 +105,7 @@ class Variable:
             raise TypeError("For power operation the exponent must be a scalar integer value")
 
         result = self.data ** exponent
-        variable = Variable(result, parents=(self), requires_grad=self.requires_grad)
+        variable = Variable(result, parents=(self), requires_grad=self.requires_grad and grad_enabled())
 
         if variable.requires_grad:
             def _back_grad_fn():
@@ -114,7 +115,7 @@ class Variable:
 
 
     def T(self) -> Variable:
-        variable = Variable(self.data.T(), parents=(self,), requires_grad=self.requires_grad)
+        variable = Variable(self.data.T(), parents=(self,), requires_grad=self.requires_grad and grad_enabled())
         
         def _back_grad_fn():
             self.grad += variable.grad
