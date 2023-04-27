@@ -35,7 +35,7 @@ class Variable:
         else:
             raise TypeError(f"The data type provided is not supported: {type(data)}")
 
-        self.data = data
+        self.data: DataContainerBase = data
         self.grad: Union[int, None] = .0 if requires_grad else None
         self.parents = parents or ()
         self._requires_grad = requires_grad
@@ -180,6 +180,10 @@ class Variable:
             return Variable(self.data.data, device=Device.GPU.value)
         else:
             raise ValueError("Unsupported device.")
+        
+
+    def __repr__(self) -> str:
+        return f"Variable({self.data.data}, requires_grad={self.requires_grad}, device={self.device})"
 
 
 if __name__ == "__main__":
