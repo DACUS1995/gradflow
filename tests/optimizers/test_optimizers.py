@@ -41,25 +41,25 @@ class TestOptimizers(unittest.TestCase):
         gradflow_sgd = NaiveSGD(parameters=[gradflow_variable_one], **_default_params)
         self.perform_optimiser_step(gradflow_sgd, gradflow_variable_one, gradflow_variable_two)
 
-        self.assertTrue = np.array_equal(torch_variable_one.detach().numpy(), gradflow_variable_one.data.data)
+        self.assertTrue(np.array_equal(torch_variable_one.detach().numpy(), gradflow_variable_one.data.data))
 
 
     def test_adam(self):
         torch_variable_one = torch.tensor([10, 20], dtype=torch.float32, requires_grad=True)
         torch_variable_two = torch.tensor([30, 40], dtype=torch.float32, requires_grad=True)
         torch_adam = torch.optim.Adam(params=[torch_variable_one], **_default_params)
+        # Performing two steps
+        self.perform_optimiser_step(torch_adam, torch_variable_one, torch_variable_two)
         self.perform_optimiser_step(torch_adam, torch_variable_one, torch_variable_two)
 
         gradflow_variable_one = Variable(np.array([10, 20], dtype=np.float32), requires_grad=True)
         gradflow_variable_two = Variable(np.array([30, 40], dtype=np.float32), requires_grad=True)
         gradflow_adam = Adam(parameters=[gradflow_variable_one], **_default_params)
+        # Performing two steps
+        self.perform_optimiser_step(gradflow_adam, gradflow_variable_one, gradflow_variable_two)
         self.perform_optimiser_step(gradflow_adam, gradflow_variable_one, gradflow_variable_two)
 
-        print(torch_variable_one)
-        print(torch_variable_one.grad)
-        print(gradflow_variable_one)
-        print(gradflow_variable_one.grad)
-        self.assertTrue = np.array_equal(torch_variable_one.detach().numpy(), gradflow_variable_one.data.data)
+        self.assertTrue(np.array_equal(torch_variable_one.detach().numpy(), gradflow_variable_one.data.data))
 
 
     def perform_optimiser_step(
