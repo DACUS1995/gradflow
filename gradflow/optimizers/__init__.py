@@ -1,4 +1,5 @@
 from gradflow.optimizers.optimizers import (
     BaseOptimizer,
-    NaiveSGD
+    NaiveSGD,
+    Adam,
 )

@@ -40,7 +40,7 @@ class TestCommonActivations(unittest.TestCase):
         output.backward(np.array([1, 1, 1]))
 
         torch_input = torch.tensor([1, 2, 3], dtype=torch.float32, requires_grad=True)
-        torch_output = torch.nn.functional.sigmoid(torch_input)
+        torch_output = torch.sigmoid(torch_input)
         torch_output.backward(torch.tensor([1, 1, 1]))
 
         self.assertTrue(np.all(output.data.data == torch_output.detach().numpy()))
